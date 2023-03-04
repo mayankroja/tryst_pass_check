@@ -82,23 +82,23 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.only(top: 40.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    // final email = emailController.text;
-                    // final password = passwordController.text;
-                    // final response = await attemptLogIn(email, password);
-                    // final result = json.decode(response);
-                    final response = await http.post(
-                        Uri.parse("${utils.api}/admin/login/"),
-                        body: json.encode(
-                          {
-                            'email': 'admin@tryst-iitd.org',
-                            'password': 'caic_2023'
-                          },
-                        ),
-                        headers: {
-                          'Content-type': 'application/json',
-                          'Accept': 'application/json'
-                        });
-                    final result = json.decode(response.body);
+                    final email = emailController.text;
+                    final password = passwordController.text;
+                    final response = await attemptLogIn(email, password);
+                    final result = json.decode(response);
+                    // final response = await http.post(
+                    //     Uri.parse("${utils.api}/admin/login/"),
+                    //     body: json.encode(
+                    //       {
+                    //         'email': 'admin@tryst-iitd.org',
+                    //         'password': 'caic_2023'
+                    //       },
+                    //     ),
+                    //     headers: {
+                    //       'Content-type': 'application/json',
+                    //       'Accept': 'application/json'
+                    //     });
+                    // final result = json.decode(response.body);
                     if (result['error'] == null) {
                       final jwt = result['tokens']['access'];
                       debugPrint(jwt);

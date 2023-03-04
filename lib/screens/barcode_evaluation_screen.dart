@@ -18,50 +18,38 @@ class BarcodeEvaluationScreen extends StatefulWidget {
 
 class _BarcodeEvaluationScreenState extends State<BarcodeEvaluationScreen> {
   Future<void> evaluate(String code, String jwt) async {
-    //   var headers = {
-    //     'Authorization':
-    //         'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjkzMzAzNDg4LCJpYXQiOjE2Nzc3NTE0ODgsImp0aSI6ImU3NWE2NjlhOTdmNzRiY2JiMzdiNGI1ZjEyZjRmODkzIiwidXNlcl9pZCI6N30.uT1iH8qSh1srmR3TSdPzuFx-QbbgIaomV4AcBj70tB4'
-    //   };
-    //   var request = http.MultipartRequest(
-    //       'POST', Uri.parse('https://api.tryst-iitd.org/admin/passes/enter/'));
-    //   request.fields.addAll({'code': '872e51a1-5905-41ef-bab4-84acf47dfe21'});
-
-    //   request.headers.addAll(headers);
-
-    //   http.StreamedResponse response = await request.send();
-
-    // if (response.statusCode == 200) {
-    //   print(await response.stream.bytesToString());
-    // } else {
-    //   print(response.reasonPhrase);
-    // }
-    final response = await http.post(
-        Uri.parse('${utils.api}/admin/passes/enter/'),
-        body: json.encode("{'code': '$code'}"),
-        headers: {
-          'Authorization': 'Bearer ${widget.jwt}',
-          'Content-type': 'application/json;charset=UTF-8',
-          'Charset': 'utf-8'
-        });
-    final result = json.decode(response.body);
-    try {
-      var jsonobj = jsonDecode(response.body);
-    } catch (e) {
-      print(e);
+    var headers = {'Authorization': 'Bearer ${widget.jwt}'};
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('${utils.api}/admin/passes/enter/'));
+    // ignore: unnecessary_string_interpolations
+    request.fields.addAll({'code': '${widget.code}'});
+    request.headers.addAll(headers);
+    final response = await request.send();
+    final result = await response.stream.bytesToString();
+    if (response.statusCode == 200) {
+      debugPrint(result);
+    } else {
+      debugPrint(result);
     }
-    //   print(result);
-    //   if (response.statusCode == 200) {
-    //     setState(() {
-    //       evaluations = 'Entry was Sucessful';
-    //     });
-    //   } else {
-    //     setState(() {
-    //       evaluations = 'error';
-    //     });
-    //   }
+    try {
+      final res = json.decode(result);
+      setState(() {
+        if (res['error'] == null) {
+          evaluations = res['message'];
+        } else {
+          String time = res['time'];
+          String error = res['error'];
+          evaluations = '$error \n $time';
+        }
+      });
+    } catch (e) {
+      setState(() {
+        evaluations = 'Invalid';
+      });
+    }
   }
 
-  String evaluations = "nothing happened";
+  String evaluations = "";
   @override
   void initState() {
     evaluate(widget.code, widget.jwt);
@@ -77,8 +65,12 @@ class _BarcodeEvaluationScreenState extends State<BarcodeEvaluationScreen> {
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(evaluations),
+            Text(
+              evaluations,
+              style: const TextStyle(fontSize: 24),
+            ),
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {

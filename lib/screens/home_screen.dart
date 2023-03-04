@@ -46,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: MobileScanner(
           controller: cameraController,
           onDetect: (capture) async {
+            cameraController.stop();
             final List<Barcode> barcodes = capture.barcodes;
             var code;
             for (final barcode in barcodes) {
@@ -55,10 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (
-                  context,
-                ) =>
-                    BarcodeEvaluationScreen(
+                builder: (context) => BarcodeEvaluationScreen(
                   jwt: widget.jwt,
                   code: code,
                 ),
